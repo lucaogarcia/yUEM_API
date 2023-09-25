@@ -25,6 +25,18 @@ public class UserController {
         return userrepository.findAll();
     }
 
+    //Ver se o usuario existe para login
+    @GetMapping("/Login/{email}/{password}")
+    public boolean login(@PathVariable String email, @PathVariable String password){
+        User user = userrepository.findByEmail(email);
+        if(user.getPassword().equals(password)){
+            return true;
+        }
+        else{
+            return false;
+        }
+    }
+
     @PostMapping("/CreateUser")
     public void createUser(@RequestBody User user){
         userrepository.save(user);
