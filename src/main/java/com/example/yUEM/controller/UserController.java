@@ -1,8 +1,12 @@
 package com.example.yUEM.controller;
+import com.example.yUEM.dto.UserWithPostDto;
+import com.example.yUEM.dto.UserPostDto;
 import com.example.yUEM.model.User;
 import com.example.yUEM.model.UserPost;
 import com.example.yUEM.model.UserPostRepository;
 import com.example.yUEM.model.UserRepository;
+import com.example.yUEM.service.UserPostService;
+import com.example.yUEM.service.UserService;
 import jakarta.persistence.EntityNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
@@ -20,21 +24,23 @@ public class UserController {
     @Autowired
     private UserPostRepository postrepository;
 
+    @Autowired
+    private UserPostService userPostService;
+
+    @Autowired
+    private UserService userService;
+
     @GetMapping
-    public List<User> getAll(){
-        return userrepository.findAll();
+    public List<UserWithPostDto> getAll(){
+        return userService.getAllUsersWithPosts();
     }
+
 
     //Ver se o usuario existe para login
     @GetMapping("/Login/{email}/{password}")
     public boolean login(@PathVariable String email, @PathVariable String password){
         User user = userrepository.findByEmail(email);
-        if(user.getPassword().equals(password)){
-            return true;
-        }
-        else{
-            return false;
-        }
+        return user.getPassword().equals(password);
     }
 
     @PostMapping("/CreateUser")
@@ -67,11 +73,16 @@ public class UserController {
         postrepository.save(userpost);
     }
 
+    //Pegar todos os posts no DTO
+    @GetMapping("/Posts")
+    public List<UserPostDto> getAllUserPosts() {
+        return userPostService.getAllUserPosts();
+    }
+
     @GetMapping("/{user_id}/Posts")
     public List<UserPost> getPosts(@PathVariable Long user_id){
         User user = userrepository.findById(user_id).orElseThrow(() -> new EntityNotFoundException("Usuário não encontrado"));
-        List<UserPost> userPosts = postrepository.findByUser(user);
-        return userPosts;
+        return postrepository.findByUser(user);
     }
 
     @PutMapping("{user_id}/UpdatePost/{post_id}")
