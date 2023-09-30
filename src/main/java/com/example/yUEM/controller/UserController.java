@@ -38,9 +38,18 @@ public class UserController {
 
     //Ver se o usuario existe para login
     @GetMapping("/Login/{email}/{password}")
-    public boolean login(@PathVariable String email, @PathVariable String password){
+    public Long login(@PathVariable String email, @PathVariable String password){
         User user = userrepository.findByEmail(email);
-        return user.getPassword().equals(password);
+        if (user == null){
+            return null;
+        }
+        else if (user.getPassword().equals(password)){
+            return user.getId();
+
+        }
+        else{
+            return null;
+        }
     }
 
     @PostMapping("/CreateUser")
@@ -70,6 +79,9 @@ public class UserController {
     public void createPost(@PathVariable Long user_id, @RequestBody UserPost userpost){
         User user = userrepository.findById(user_id).orElseThrow(() -> new EntityNotFoundException("Usuário não encontrado"));
         userpost.setUsers(user);
+        if (userpost.getLikePost() == null){
+            userpost.setLikePost(0);
+        }
         postrepository.save(userpost);
     }
 
@@ -88,7 +100,10 @@ public class UserController {
     @PutMapping("{user_id}/UpdatePost/{post_id}")
     public void updatePost(@PathVariable Long post_id, @RequestBody UserPost userpost){
         UserPost post = postrepository.findById(post_id).orElseThrow(() -> new EntityNotFoundException("Post não encontrado"));
+        //mantem o like do post
+        userpost.setLikePost(post.getLikePost());
         postrepository.save(updatepost(userpost, post));
+
     }
     private UserPost updatepost(UserPost userpost, UserPost post){
         post.setMessage(userpost.getMessage());
@@ -99,6 +114,20 @@ public class UserController {
     @DeleteMapping("/{user_id}/DeletePost/{post_id}")
     public void deletePost(@PathVariable Long post_id){
         postrepository.deleteById(post_id);
+    }
+
+    @PutMapping("LikePost/{post_id}")
+    public void likePost(@PathVariable Long post_id){
+        UserPost post = postrepository.findById(post_id).orElseThrow(() -> new EntityNotFoundException("Post não encontrado"));
+        post.setLikePost(post.getLikePost() + 1);
+        postrepository.save(post);
+    }
+
+
+    //Ranquear cursos com mais posts
+    @GetMapping("/Ranking")
+    public List<String> getRanking(){
+        return userService.printCoursesWithMostPosts();
     }
 
 }

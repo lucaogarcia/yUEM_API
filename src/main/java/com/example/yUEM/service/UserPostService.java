@@ -40,4 +40,12 @@ public class UserPostService {
 
         return userPostDTOs;
     }
+
+    public List<UserPostDto> getAllPostsByUserId(Long id) {
+        return null;
+    }
+
+    public List<String> getRanking() {
+        return null;
+    }
 }

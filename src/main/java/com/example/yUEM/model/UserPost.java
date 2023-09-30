@@ -21,7 +21,8 @@ public class UserPost {
     @Column(name = "likepost")
     private Integer likePost;
 
-    @ManyToOne(fetch = FetchType.EAGER)
+
+    @ManyToOne(optional = false)
     @JoinColumn(name = "users_id")
     @JsonIgnore
     private User user;

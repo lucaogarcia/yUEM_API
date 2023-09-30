@@ -9,6 +9,8 @@ import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 @Service
 public class UserService {
@@ -42,6 +44,27 @@ public class UserService {
         }
 
         return usersWithPosts;
+    }
+
+    public List<String> printCoursesWithMostPosts() {
+        // Recupere todos os usuários
+        List<User> allUsers = userRepository.findAll();
+
+        // Crie um mapa para armazenar o número de posts por curso
+        Map<String, Long> coursePostCounts = allUsers.stream()
+                .collect(Collectors.groupingBy(
+                        User::getCourse,  // Obtém o atributo 'course' de cada usuário
+                        Collectors.summingLong(user -> user.getUserPosts().size()) // Conta o número de posts para cada curso
+                ));
+
+        // Ordene os cursos com base no número de posts em ordem decrescente
+
+        // Imprima os nomes dos cursos na ordem desejada
+
+        return coursePostCounts.entrySet().stream()
+                .sorted((entry1, entry2) -> Long.compare(entry2.getValue(), entry1.getValue()))
+                .map(Map.Entry::getKey)
+                .toList();
     }
 
 }

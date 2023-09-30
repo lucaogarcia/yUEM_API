@@ -31,6 +31,6 @@ public class User {
     private boolean anonymous;
     @Column(name = "gender")
     private String gender;
-    @OneToMany(mappedBy = "user")
+    @OneToMany(mappedBy = "user", fetch = FetchType.EAGER)
     private List<UserPost> userPosts;
 }

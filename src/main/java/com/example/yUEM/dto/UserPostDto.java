@@ -11,6 +11,7 @@ public class UserPostDto {
     private int likePost;
     private Long userId;
 
+
     public UserPostDto() {
     }
 }
